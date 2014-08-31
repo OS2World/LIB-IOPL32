@@ -1,0 +1,2 @@
+testiopl.exe : testiopl.cpp iopl32.lib
+	icc -Gs- testiopl.cpp iopl32.lib

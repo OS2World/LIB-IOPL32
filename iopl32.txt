@@ -1,0 +1,105 @@
+                                 IOPL32
+                                ========
+
+What is IOPL32?
+===============
+
+    IOPL32 is a dynamic link library which contains functions to access
+IOPL segments from within 32-bit OS/2 programs. Of course it has always
+been possible and documented in CSet/VAC++/other infos, but those infos
+state that it is neccessary to build a 16-bit segment sitting in ring 2
+and having  IOPL  privilege  and, when one needs  to perform IO, he/she
+has to invoke these 16-bit functions.
+
+    There are a few unpleasant things due to this limitation, they are:
+
+        1) WLINK from  Watcom C/C++ is not  able  to make  correct IOPL
+           callgates when generating 32-bit program.  I used to link my
+           programs with LINK386 just to avoid this problem.
+
+        2) it is possible that during converting  FLAT variable address
+           into SEL16:OFS16 tile representation the result crosses  the
+           segment boundary and an  application traps.  VAC has special
+           switch  `-Gt+'  to eliminate  a possibilty of this but other
+           compilers have not.
+
+        3) if one needs to do many IO operations he/she has to call IO
+           thunks many times so his/her application code is overheaded
+           because of  context switching  from user level  ring 3 into
+           IOPL ring 2 and vice versa.
+
+    IOPL32 solves all the problems mentioned above.  It makes possible
+to have a  32-bit segments  with IOPL privilege.  IOPL32 uses  *never*
+documented  potentialities  inherent in the OS/2  GDT found by hacking
+OS2KRNL and playing with excellent Theseus/2.
+
+How to use IOPL32?
+==================
+
+    Put  IOPL32.DLL  somewhere in your  LIBPATH, include IOPL32.H into
+your source, call functions given  by IOPL32 and link your application
+with IOPL32.LIB.
+
+    There are three functions:
+
+                int getCurrentRing (void);
+                int enterIOPL32 (void);
+                int leaveIOPL32 (void);
+
+        getCurrentRing() returns current ring number. It is 2 for IOPL
+and 3 for user level application.
+
+        enterIOPL32() turns current segment into 32-bit  IOPL segment.
+It returns 0 on success, -1 otherwise.
+
+        leaveIOPL32() puts current segment back to ring #3. It returns
+0 on success and -1 on error, as previous function does.
+
+Building IOPL32
+===============
+
+    This archive  contains IOPL32.ASM and IOPL32.MAK for building  the
+library. There is also TESTIOPL.CPP for testing purposes.  Precompiled
+TEST_ICC.EXE has been built with VAC++ 3.0/Patchlevel 8,  TEST_WPP.EXE
+has been build with  Watcom C/C++  10.5/Patchlevel B.  Makefiles named
+TESTIOPL.ICC and TESTIOPL.WPP, respectively.
+
+Library status
+==============
+
+IOPL32 is freeware.
+
+Disclaimer
+==========
+
+     YOU ARE USING THIS LIBRARY AT YOUR OWN RISK!!! In no event I take
+     any  responsibillity   for  damages,  problems,  custodies,  etc.
+     resulting  from  use, inability  to  use, misuse,  possession  or
+     non-possession of this library directly or indirectly.
+
+     THE SOFTWARE  IS PROVIDED  ``AS IS''  AND WITHOUT ANY  EXPRESS OR
+     IMPLIED  WARRANTIES,  INCLUDING,  WITHOUT LIMITATION, THE IMPLIED
+     WARRANTIES  OF  MERCHANTABILITY  AND  FITNESS  FOR  A  PARTICULAR
+     PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+     PROGRAM IS WITH YOU.      SHOULD THE LIBRARY PROVE DEFECTIVE, YOU
+     ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+     Permission is granted to redistribute this library free of charge,
+     provided  it  is distributed in the  full archive with unmodified
+     contents and  no profit beyond the price of the media  on which it
+     is distributed  is made.  Exception to the last rule: the  library
+     may be included  on freeware/shareware  collections on CD-ROM,  as
+     well as on magazine cover CD-ROMs.
+
+     IBM, CSet, VAC++, Theseus/2 and OS/2 are registered  trademarks of
+     International Business Machines Corporation.
+
+     Watcom C/C++ is a registered trademark of Sybase Inc.
+
+Author
+======
+
+    IOPL32 has  been written by Rinat H. Sadretdinow in January, 1998.
+Feel free to contact with me if you have any questions.
+
+    Rinat H. Sadretdinow <rhs@newmail.ru>
